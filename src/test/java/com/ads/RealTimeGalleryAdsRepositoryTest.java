@@ -10,8 +10,8 @@ import java.util.List;
 import static com.ads.helpers.AdBuilder.aPromotionAd;
 import static com.ads.helpers.SearchBuilder.aSearch;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
 class RealTimeGalleryAdsRepositoryTest {
@@ -54,20 +54,23 @@ class RealTimeGalleryAdsRepositoryTest {
   }
 
   @Test
-  void when_get_all_ads_then_search_only_projects_from_network() {
+  void maps_all_ads_with_photo_to_gallery_ads() {
     when(adsRepository.search(COUNTRY, search)).thenReturn(searchResult(
-        ad("id1").build(),
-        ad("id2").build(),
-        ad("id3").build()
+        ad("id1", "photo1").build(),
+        ad("id2", "photo2").build(),
+        ad("id3", "photo3").build()
     ));
 
     List<GalleryAd> galleryAds = realTimeGalleryAdsRepository.getAll();
 
-    assertThat(galleryAds, is(getExpectedAdsGallery()));
+    assertThat(galleryAds, contains(
+        galleryAd("id1", "photo1"),
+        galleryAd("id2", "photo2"),
+        galleryAd("id3", "photo3")));
   }
 
   @Test
-  public void when_ad_has_not_photo_ignore_it_for_ad_gallery() {
+  public void ignore_ads_with_no_photos_in_gallery_ads() {
     when(adsRepository.search(COUNTRY, search)).thenReturn(
         searchResult(ad("id1").withNoPhoto().build())
     );
@@ -78,7 +81,16 @@ class RealTimeGalleryAdsRepositoryTest {
   }
 
   @Test
-  void when_get_all_twice_then_return_cache_values() {
+  void when_no_ads_are_found_there_are_no_gallery_ads() {
+    when(adsRepository.search(COUNTRY, search)).thenReturn(noSearchResult());
+
+    List<GalleryAd> galleryAds = realTimeGalleryAdsRepository.getAll();
+
+    assertThat(galleryAds, empty());
+  }
+
+  @Test
+  void when_cache_has_not_expired_the_cached_values_are_used() {
     realTimeGalleryAdsRepository = createRealTimeGalleryAdsRepository(true);
     realTimeGalleryAdsRepository.resetCache();
     when(adsRepository.search(COUNTRY, search)).thenReturn(searchResult(ad("id1").build()));
@@ -91,7 +103,7 @@ class RealTimeGalleryAdsRepositoryTest {
   }
 
   @Test
-  void no_return_cached_results_when_cached_is_expired() {
+  void when_cache_expires_new_values_are_retrieved() {
     long maxCachedTime = 30 * 60 * 1000L;
     realTimeGalleryAdsRepository = createRealTimeGalleryAdsRepository(true);
     realTimeGalleryAdsRepository.resetCache();
@@ -105,17 +117,9 @@ class RealTimeGalleryAdsRepositoryTest {
     verify(adsRepository, times(2)).search(COUNTRY, search);
   }
 
-  private List<GalleryAd> getExpectedAdsGallery() {
-    return Arrays.asList(
-        galleryAd("id1"),
-        galleryAd("id2"),
-        galleryAd("id3")
-    );
-  }
-
-  private GalleryAd galleryAd(String id) {
+  private GalleryAd galleryAd(String id, String photo) {
     return new GalleryAd(
-        id, PHOTO, TITLE, URL, PRICE, DESCRIPTION, ROOMS,
+        id, photo, TITLE, URL, PRICE, DESCRIPTION, ROOMS,
         BATHROOMS, BUILT_AREA
     );
   }
@@ -125,6 +129,10 @@ class RealTimeGalleryAdsRepositoryTest {
   }
 
   private AdBuilder ad(String id) {
+    return ad(id, PHOTO);
+  }
+
+  private AdBuilder ad(String id, String photo) {
     return aPromotionAd().
         withId(id).
         withDescription(DESCRIPTION).
@@ -134,12 +142,16 @@ class RealTimeGalleryAdsRepositoryTest {
         .withNumberOfRooms(ROOMS)
         .withBuiltArea(BUILT_AREA)
         .withUrl(URL)
-        .withPhoto(PHOTO);
+        .withPhoto(photo);
   }
 
   private RealTimeGalleryAdsRepository createRealTimeGalleryAdsRepository(boolean useCache) {
     return new RealTimeGalleryAdsRepository(
         adsRepository, cache,
         useCache, clock);
+  }
+
+  private SearchResult noSearchResult() {
+    return null;
   }
 }
