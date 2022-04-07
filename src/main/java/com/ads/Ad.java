@@ -27,7 +27,7 @@ public class Ad {
     this.description = description;
   }
 
-  public boolean hasPhotos() {
+  public boolean hasPhoto() {
     return !photo.isEmpty();
   }
 

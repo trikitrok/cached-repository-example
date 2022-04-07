@@ -2,6 +2,6 @@ package com.ads;
 
 import java.util.List;
 
-public interface AdsGalleryRepository {
+public interface GalleryAdsRepository {
   List<GalleryAd> getAll();
 }

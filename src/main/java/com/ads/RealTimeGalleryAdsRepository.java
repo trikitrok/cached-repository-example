@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RealTimeAdsGalleryRepository implements AdsGalleryRepository {
+public class RealTimeGalleryAdsRepository implements GalleryAdsRepository {
   private final boolean useCache;
   private final Clock clock;
   private static SearchResult cachedSearchResult;
@@ -12,7 +12,7 @@ public class RealTimeAdsGalleryRepository implements AdsGalleryRepository {
   private final Cache cache;
   private final AdsRepository adsRepository;
 
-  public RealTimeAdsGalleryRepository(AdsRepository adsRepository, Cache cache,
+  public RealTimeGalleryAdsRepository(AdsRepository adsRepository, Cache cache,
                                       boolean useCache, Clock clock) {
 
     this.adsRepository = adsRepository;
@@ -28,7 +28,7 @@ public class RealTimeAdsGalleryRepository implements AdsGalleryRepository {
       return Collections.emptyList();
     }
     return searchResult.getAds().stream()
-        .filter(ad -> ad.hasPhotos())
+        .filter(ad -> ad.hasPhoto())
         .map(this::mapAdToAdGallery)
         .collect(Collectors.toList());
   }

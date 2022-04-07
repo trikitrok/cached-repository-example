@@ -15,7 +15,7 @@ public class AdBuilder {
 
   public static AdBuilder aPromotionAd() {
     AdBuilder adBuilder = new AdBuilder();
-    adBuilder.withPhotos("");
+    adBuilder.withNoPhoto();
     return adBuilder;
   }
 
@@ -66,10 +66,12 @@ public class AdBuilder {
     return this;
   }
 
-  public AdBuilder withPhotos(String photo) {
+  public AdBuilder withPhoto(String photo) {
     this.photo = photo;
     return this;
   }
 
-
+  public AdBuilder withNoPhoto() {
+    return withPhoto("");
+  }
 }
