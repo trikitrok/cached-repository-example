@@ -49,7 +49,7 @@ class CachedGalleryAdsRepositoryTest {
   }
 
   @Test
-  void when_cache_expires_new_values_are_used() {
+  void when_cache_expires_new_values_are_retrieved() {
     when(clock.getTimeInMillis()).thenReturn(
         CACHE_DURATION.toMillis(),
         CACHE_DURATION.toMillis() + 1,
