@@ -1,7 +1,7 @@
 package com.ads.helpers;
 
-import com.ads.OperationTypes;
-import com.ads.Search;
+import com.ads.domain.OperationTypes;
+import com.ads.domain.Search;
 
 public class SearchBuilder {
   private String countryId;

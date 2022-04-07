@@ -1,4 +1,4 @@
-package com.ads;
+package com.ads.domain;
 
 import java.util.Objects;
 
@@ -27,7 +27,7 @@ public class Ad {
     this.description = description;
   }
 
-  public boolean hasPhotos() {
+  public boolean hasPhoto() {
     return !photo.isEmpty();
   }
 

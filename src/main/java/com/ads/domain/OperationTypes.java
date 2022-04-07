@@ -1,4 +1,4 @@
-package com.ads;
+package com.ads.domain;
 
 public enum OperationTypes {
   Sale

@@ -1,4 +1,4 @@
-package com.ads;
+package com.ads.domain;
 
 import java.util.Objects;
 
@@ -13,7 +13,9 @@ public class GalleryAd {
   private final int numberOfBathrooms;
   private final float builtArea;
 
-  public GalleryAd(String id, String photoUrl, String title, String url, long price, String description, int numberOfRooms, int numberOfBathrooms, float builtArea) {
+  public GalleryAd(String id, String photoUrl, String title, String url,
+                   long price, String description, int numberOfRooms,
+                   int numberOfBathrooms, float builtArea) {
 
     this.id = id;
     this.photoUrl = photoUrl;

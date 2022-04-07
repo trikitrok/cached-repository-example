@@ -1,4 +1,4 @@
-package com.ads;
+package com.ads.domain;
 
 import java.util.List;
 import java.util.Objects;
