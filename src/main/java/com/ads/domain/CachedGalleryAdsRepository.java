@@ -22,23 +22,22 @@ public class CachedGalleryAdsRepository implements GalleryAdsRepository {
     @Override
     public List<GalleryAd> getAll()  {
       long timeInMillis = clock.getTimeInMillis();
-      if (noNeedForFreshAds(timeInMillis)) {
-        return cachedGalleryAds;
+      if (needToRefreshCache(timeInMillis)) {
+        refreshCache(timeInMillis);
       }
-      refreshCacheOn(timeInMillis);
       return cachedGalleryAds;
     }
 
-    private void refreshCacheOn(long timeInMillis)  {
+  private boolean needToRefreshCache(long timeInMillis) {
+    return cachedGalleryAds == null || hasCacheExpired(timeInMillis);
+  }
+
+  private boolean hasCacheExpired(long timeInMillis) {
+    return duration.toMillis() + lastRefreshTime < timeInMillis;
+  }
+
+  private void refreshCache(long timeInMillis)  {
       lastRefreshTime = timeInMillis;
       cachedGalleryAds = galleryAdsRepository.getAll();
-    }
-
-    private boolean noNeedForFreshAds(long timeInMillis) {
-      return cachedGalleryAds != null && hasNotCachedValueExpired(timeInMillis);
-    }
-
-    private boolean hasNotCachedValueExpired(long timeInMillis) {
-      return duration.toMillis() + lastRefreshTime >= timeInMillis;
     }
 }
