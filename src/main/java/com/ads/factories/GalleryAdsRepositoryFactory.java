@@ -13,23 +13,23 @@ import java.util.Map;
 
 public class GalleryAdsRepositoryFactory {
   private static final Duration TIME_TO_EXPIRE_CACHE = Duration.ofMinutes(30L);
-  private static Map<Integer, GalleryAdsRepository> instanceByCountries = new HashMap<>();
+  private static Map<Integer, GalleryAdsRepository> instanceByCountry = new HashMap<>();
 
-    public static GalleryAdsRepository createUniqueCached(int countryId){
-      if (!instanceByCountries.containsKey(countryId)) {
-        instanceByCountries.put(countryId, createInstance(countryId));
-      }
-      return instanceByCountries.get(countryId);
+  public static GalleryAdsRepository createUniqueCached(int countryId) {
+    if (!instanceByCountry.containsKey(countryId)) {
+      instanceByCountry.put(countryId, createInstance(countryId));
     }
+    return instanceByCountry.get(countryId);
+  }
 
-    private static GalleryAdsRepository createInstance(
-        int countryId) {
-      GalleryAdsRepository galleryAdsRepository = new RealTimeGalleryAdsRepository(
-          new RealTimeAdsRepository(countryId),
-          ConfigurationsByCountry.get(countryId));
-      return new CachedGalleryAdsRepository(
-          galleryAdsRepository,
-          new SystemClock(),
-          TIME_TO_EXPIRE_CACHE);
-    }
+  private static GalleryAdsRepository createInstance(int countryId) {
+    GalleryAdsRepository galleryAdsRepository = new RealTimeGalleryAdsRepository(
+        new RealTimeAdsRepository(countryId),
+        ConfigurationsByCountry.get(countryId)
+    );
+    return new CachedGalleryAdsRepository(
+        galleryAdsRepository,
+        new SystemClock(),
+        TIME_TO_EXPIRE_CACHE);
+  }
 }
