@@ -9,14 +9,16 @@ public class RealTimeGalleryAdsRepository implements GalleryAdsRepository {
   private final Clock clock;
   private static SearchResult cachedSearchResult;
   private static long cachedTime;
-  private final Cache cache;
+  private final Configuration configuration;
   private final AdsRepository adsRepository;
 
-  public RealTimeGalleryAdsRepository(AdsRepository adsRepository, Cache cache,
-                                      boolean useCache, Clock clock) {
+  public RealTimeGalleryAdsRepository(
+      AdsRepository adsRepository,
+      Configuration configuration,
+      boolean useCache, Clock clock) {
 
     this.adsRepository = adsRepository;
-    this.cache = cache;
+    this.configuration = configuration;
     this.useCache = useCache;
     this.clock = clock;
   }
@@ -29,7 +31,7 @@ public class RealTimeGalleryAdsRepository implements GalleryAdsRepository {
     }
     return searchResult.getAds().stream()
         .filter(ad -> ad.hasPhoto())
-        .map(this::mapAdToAdGallery)
+        .map(GalleryAd::fromAd)
         .collect(Collectors.toList());
   }
 
@@ -38,7 +40,7 @@ public class RealTimeGalleryAdsRepository implements GalleryAdsRepository {
       return getSearchResult();
     }
     long timeInMillis = clock.getTimeInMillis();
-    if (cacheIsExpired(timeInMillis)){
+    if (cacheIsExpired(timeInMillis)) {
       cachedSearchResult = null;
     }
     if (cachedSearchResult == null) {
@@ -53,34 +55,20 @@ public class RealTimeGalleryAdsRepository implements GalleryAdsRepository {
   }
 
   private SearchResult getSearchResult() {
-    return adsRepository.search(cache.getIdCountry(), createSearch());
-  }
-
-  private GalleryAd mapAdToAdGallery(Ad ad) {
-    return new GalleryAd(
-        ad.getId(),
-        ad.getPhotoUrl(),
-        ad.getTitle(),
-        ad.getUrl(),
-        ad.getPrice(),
-        ad.getDescription(),
-        ad.getNumberOfRooms(),
-        ad.getNumberOfBathrooms(),
-        ad.getBuiltArea()
-    );
+    return adsRepository.search(configuration.getCountryId(), createSearch());
   }
 
   private Search createSearch() {
-    String projectPropertyTypeId = cache.getPropertyTypesPromotion();
+    String projectPropertyTypeId = configuration.getPromotionPropertyType();
     String noLocationId = "0";
     return new Search(
-        cache.getIdCountry(),
+        configuration.getCountryId(),
         OperationTypes.Sale,
         projectPropertyTypeId,
         noLocationId);
   }
 
-  public void resetCache(){
+  public void resetCache() {
     cachedSearchResult = null;
   }
 }

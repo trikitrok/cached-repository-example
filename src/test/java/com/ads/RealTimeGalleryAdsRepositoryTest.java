@@ -30,15 +30,15 @@ class RealTimeGalleryAdsRepositoryTest {
   private RealTimeGalleryAdsRepository realTimeGalleryAdsRepository;
   private Search search;
   private Clock clock;
-  private Cache cache;
+  private Configuration configuration;
 
   @BeforeEach
   public void setUp() {
-    cache = mock(Cache.class);
-    when(cache.getPropertyTypesPromotion()).thenReturn(PROMOTION_TYPE_ID);
+    configuration = mock(Configuration.class);
+    when(configuration.getPromotionPropertyType()).thenReturn(PROMOTION_TYPE_ID);
 
     clock = mock(Clock.class);
-    when(cache.getIdCountry()).thenReturn(COUNTRY);
+    when(configuration.getCountryId()).thenReturn(COUNTRY);
 
     search = aSearch()
         .withCountryId(COUNTRY)
@@ -147,7 +147,7 @@ class RealTimeGalleryAdsRepositoryTest {
 
   private RealTimeGalleryAdsRepository createRealTimeGalleryAdsRepository(boolean useCache) {
     return new RealTimeGalleryAdsRepository(
-        adsRepository, cache,
+        adsRepository, configuration,
         useCache, clock);
   }
 
