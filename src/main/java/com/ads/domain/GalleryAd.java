@@ -13,6 +13,20 @@ public class GalleryAd {
   private final int numberOfBathrooms;
   private final float builtArea;
 
+  public static GalleryAd fromAd(Ad ad) {
+    return new GalleryAd(
+        ad.getId(),
+        ad.getPhotoUrl(),
+        ad.getTitle(),
+        ad.getUrl(),
+        ad.getPrice(),
+        ad.getDescription(),
+        ad.getNumberOfRooms(),
+        ad.getNumberOfBathrooms(),
+        ad.getBuiltArea()
+    );
+  }
+
   public GalleryAd(String id, String photoUrl, String title, String url,
                    long price, String description, int numberOfRooms,
                    int numberOfBathrooms, float builtArea) {

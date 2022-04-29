@@ -3,7 +3,7 @@ package com.ads.factories;
 import com.ads.domain.CachedGalleryAdsRepository;
 import com.ads.domain.GalleryAdsRepository;
 import com.ads.domain.RealTimeGalleryAdsRepository;
-import com.ads.infrastructure.CachesByCoutries;
+import com.ads.infrastructure.ConfigurationsByCountry;
 import com.ads.infrastructure.RealTimeAdsRepository;
 import com.ads.infrastructure.SystemClock;
 
@@ -15,7 +15,7 @@ public class GalleryAdsRepositoryFactory {
   private static final Duration TIME_TO_EXPIRE_CACHE = Duration.ofMinutes(30L);
   private static Map<Integer, GalleryAdsRepository> instanceByCountries = new HashMap<>();
 
-    public static GalleryAdsRepository getUniqueCached(int countryId){
+    public static GalleryAdsRepository createUniqueCached(int countryId){
       if (!instanceByCountries.containsKey(countryId)) {
         instanceByCountries.put(countryId, createInstance(countryId));
       }
@@ -26,7 +26,7 @@ public class GalleryAdsRepositoryFactory {
         int countryId) {
       GalleryAdsRepository galleryAdsRepository = new RealTimeGalleryAdsRepository(
           new RealTimeAdsRepository(countryId),
-          CachesByCoutries.getInstance(countryId));
+          ConfigurationsByCountry.get(countryId));
       return new CachedGalleryAdsRepository(
           galleryAdsRepository,
           new SystemClock(),

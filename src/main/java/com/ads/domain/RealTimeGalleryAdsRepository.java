@@ -6,20 +6,22 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 
 public class RealTimeGalleryAdsRepository implements GalleryAdsRepository {
-  private final Cache cache;
+  private final Configuration configuration;
   private final AdsRepository adsRepository;
   private static final String NO_LOCATION_ID = "0";
 
-  public RealTimeGalleryAdsRepository(AdsRepository adsRepository, Cache cache) {
+  public RealTimeGalleryAdsRepository(
+      AdsRepository adsRepository,
+      Configuration configuration) {
     this.adsRepository = adsRepository;
-    this.cache = cache;
+    this.configuration = configuration;
   }
 
   @Override
   public List<GalleryAd> getAll() {
     SearchResult searchResult = adsRepository.search(
-        cache.getIdCountry(),
-        createSearch(cache.getPropertyTypesPromotion())
+        configuration.getCountryId(),
+        createSearch(configuration.getPromotionPropertyType())
     );
 
     if (searchResult == null) {
@@ -28,27 +30,13 @@ public class RealTimeGalleryAdsRepository implements GalleryAdsRepository {
 
     return searchResult.getAds().stream()
         .filter(ad -> ad.hasPhoto())
-        .map(this::mapAdToAdGallery)
+        .map(GalleryAd::fromAd)
         .collect(Collectors.toList());
-  }
-
-  private GalleryAd mapAdToAdGallery(Ad ad) {
-    return new GalleryAd(
-        ad.getId(),
-        ad.getPhotoUrl(),
-        ad.getTitle(),
-        ad.getUrl(),
-        ad.getPrice(),
-        ad.getDescription(),
-        ad.getNumberOfRooms(),
-        ad.getNumberOfBathrooms(),
-        ad.getBuiltArea()
-    );
   }
 
   private Search createSearch(String projectPropertyTypeId) {
     return new Search(
-        cache.getIdCountry(),
+        configuration.getCountryId(),
         OperationTypes.Sale,
         projectPropertyTypeId,
         NO_LOCATION_ID);
